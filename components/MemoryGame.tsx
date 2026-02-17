@@ -63,13 +63,15 @@ export default function MemoryGame() {
     setPersonalHistory(savedHistory);
   };
 
-  useEffect(() => {
-    let timer;
-    if (isPlaying && !gameComplete) {
-      timer = setInterval(() => setTime(t => t + 1), 1000);
-    }
-    return () => clearInterval(timer);
-  }, [isPlaying, gameComplete]);
+ useEffect(() => {
+  let timer: NodeJS.Timeout | undefined;
+  if (isPlaying && !gameComplete) {
+    timer = setInterval(() => setTime(t => t + 1), 1000);
+  }
+  return () => {
+    if (timer) clearInterval(timer);
+  };
+}, [isPlaying, gameComplete]);
 
   useEffect(() => {
     if (matched.length === cards.length && cards.length > 0) {
