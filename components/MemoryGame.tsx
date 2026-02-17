@@ -11,7 +11,6 @@ const DIFFICULTIES = {
 
 type DifficultyType = 'easy' | 'medium' | 'hard';
 
-
 type Card = {
   id: number;
   emoji: string;
@@ -65,36 +64,36 @@ export default function MemoryGame() {
   };
 
   const loadSharedData = async () => {
-  try {
-    const easyData = localStorage.getItem('leaderboard_easy');
-    const mediumData = localStorage.getItem('leaderboard_medium');
-    const hardData = localStorage.getItem('leaderboard_hard');
-    
-    setLeaderboard({
-      easy: easyData ? JSON.parse(easyData) : [],
-      medium: mediumData ? JSON.parse(mediumData) : [],
-      hard: hardData ? JSON.parse(hardData) : []
-    });
-  } catch (error) {
-    console.log('Loading leaderboard:', error);
-    setLeaderboard({ easy: [], medium: [], hard: [] });
-  }
-};
+    try {
+      const easyData = localStorage.getItem('leaderboard_easy');
+      const mediumData = localStorage.getItem('leaderboard_medium');
+      const hardData = localStorage.getItem('leaderboard_hard');
+      
+      setLeaderboard({
+        easy: easyData ? JSON.parse(easyData) : [],
+        medium: mediumData ? JSON.parse(mediumData) : [],
+        hard: hardData ? JSON.parse(hardData) : []
+      });
+    } catch (error) {
+      console.log('Loading leaderboard:', error);
+      setLeaderboard({ easy: [], medium: [], hard: [] });
+    }
+  };
 
   const loadPersonalHistory = () => {
     const savedHistory = JSON.parse(localStorage.getItem('memoryGameHistory') || '{"easy":[],"medium":[],"hard":[]}');
     setPersonalHistory(savedHistory);
   };
 
- useEffect(() => {
-  let timer: NodeJS.Timeout | undefined;
-  if (isPlaying && !gameComplete) {
-    timer = setInterval(() => setTime(t => t + 1), 1000);
-  }
-  return () => {
-    if (timer) clearInterval(timer);
-  };
-}, [isPlaying, gameComplete]);
+  useEffect(() => {
+    let timer: NodeJS.Timeout | undefined;
+    if (isPlaying && !gameComplete) {
+      timer = setInterval(() => setTime(t => t + 1), 1000);
+    }
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [isPlaying, gameComplete]);
 
   useEffect(() => {
     if (matched.length === cards.length && cards.length > 0) {
@@ -162,26 +161,26 @@ export default function MemoryGame() {
       date: new Date().toISOString()
     };
 
-try {
-  const currentData = localStorage.getItem(`leaderboard_${difficulty}`);
-  let currentLeaderboard = currentData ? JSON.parse(currentData) : [];
-  
-  currentLeaderboard = [...currentLeaderboard, newEntry]
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 100);
-  
-  localStorage.setItem(`leaderboard_${difficulty}`, JSON.stringify(currentLeaderboard));
-  
-  loadSharedData();
-} catch (error) {
-  console.error('Error saving score:', error);
-}
+    try {
+      const currentData = localStorage.getItem(`leaderboard_${difficulty}`);
+      let currentLeaderboard = currentData ? JSON.parse(currentData) : [];
+      
+      currentLeaderboard = [...currentLeaderboard, newEntry]
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 100);
+      
+      localStorage.setItem(`leaderboard_${difficulty}`, JSON.stringify(currentLeaderboard));
+      
+      loadSharedData();
+    } catch (error) {
+      console.error('Error saving score:', error);
+    }
 
     if (nickname.trim() === userNickname || !userNickname) {
       const savedHistory = JSON.parse(localStorage.getItem('memoryGameHistory') || '{"easy":[],"medium":[],"hard":[]}');
       savedHistory[difficulty] = [...savedHistory[difficulty], newEntry]
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
+      
       localStorage.setItem('memoryGameHistory', JSON.stringify(savedHistory));
       localStorage.setItem('memoryGameNickname', nickname.trim());
       
@@ -244,7 +243,7 @@ try {
 
           <div className="bg-white rounded-xl shadow-md p-4 mb-6">
             <div className="flex gap-2 justify-center">
-             {Object.entries(DIFFICULTIES).map(([key, { name }]) => (
+              {Object.entries(DIFFICULTIES).map(([key, { name }]) => (
                 <button
                   key={key}
                   onClick={() => setDifficulty(key as DifficultyType)}
@@ -535,27 +534,21 @@ try {
                       <span className="font-semibold text-gray-700">개인 향상도</span>
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-xs">
-                     <div>
-                       <span className="text-gray-600">이동 횟수: </span>
-                       <span className={getPersonalImprovement()?.movesImprovement && parseFloat(getPersonalImprovement()!.movesImprovement) > 0 ? 'text-green-600 font-semibold' : 'text-red-600'}>
-                        {getPersonalImprovement()?.movesImprovement && parseFloat(getPersonalImprovement()!.movesImprovement) > 0 ? '▼' : '▲'} {Math.abs(parseFloat(getPersonalImprovement()?.movesImprovement || '0'))}%
-                       </span>
-                      </div>
                       <div>
-                        <span className="text-gray-600">시간: </span>
-                        <span className={getPersonalImprovement()?.timeImprovement && parseFloat(getPersonalImprovement()!.timeImprovement) > 0 ? 'text-green-600 font-semibold' : 'text-red-600'}>
-                          {getPersonalImprovement()?.timeImprovement && parseFloat(getPersonalImprovement()!.timeImprovement) > 0 ? '▼' : '▲'} {Math.abs(parseFloat(getPersonalImprovement()?.timeImprovement || '0'))}%
+                        <span className="text-gray-600">이동 횟수: </span>
+                        <span className={parseFloat(getPersonalImprovement()!.movesImprovement) > 0 ? 'text-green-600 font-semibold' : 'text-red-600'}>
+                          {parseFloat(getPersonalImprovement()!.movesImprovement) > 0 ? '▼' : '▲'} {Math.abs(parseFloat(getPersonalImprovement()!.movesImprovement))}%
                         </span>
                       </div>
                       <div>
                         <span className="text-gray-600">시간: </span>
-                        <span className={getPersonalImprovement().timeImprovement > 0 ? 'text-green-600 font-semibold' : 'text-red-600'}>
-                          {getPersonalImprovement().timeImprovement > 0 ? '▼' : '▲'} {Math.abs(getPersonalImprovement().timeImprovement)}%
+                        <span className={parseFloat(getPersonalImprovement()!.timeImprovement) > 0 ? 'text-green-600 font-semibold' : 'text-red-600'}>
+                          {parseFloat(getPersonalImprovement()!.timeImprovement) > 0 ? '▼' : '▲'} {Math.abs(parseFloat(getPersonalImprovement()!.timeImprovement))}%
                         </span>
                       </div>
                     </div>
                     <div className="text-xs text-gray-500 mt-1">
-                      평균 대비 (총 {getPersonalImprovement().games}게임)
+                      평균 대비 (총 {getPersonalImprovement()!.games}게임)
                     </div>
                   </div>
                 )}
