@@ -11,14 +11,35 @@ const DIFFICULTIES = {
 
 type DifficultyType = 'easy' | 'medium' | 'hard';
 
+
+type Card = {
+  id: number;
+  emoji: string;
+  matched: boolean;
+};
+
+type GameEntry = {
+  nickname: string;
+  moves: number;
+  time: number;
+  score: number;
+  date: string;
+};
+
+type LeaderboardData = {
+  easy: GameEntry[];
+  medium: GameEntry[];
+  hard: GameEntry[];
+};
+
 const EMOJIS = ['🎮', '🎯', '🎨', '🎭', '🎪', '🎬', '🎵', '🎸', '🎹', '🎺', '🎻', '🎲', '🎰', '🎳', '⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏉', '🎱', '🏓', '🏸', '🏒', '🏑', '🥊', '🥋', '⛳', '🏹', '🎣', '🥅', '🎄', '🎃', '🎁', '🎈', '🎀', '🎊', '🎉', '🎇', '🎆', '🌟', '⭐', '✨', '💫', '🌈', '☀️', '🌙', '⚡', '🔥', '💧', '❄️', '☁️', '🌸', '🌺', '🌻', '🌷', '🌹', '🏵️', '🌼', '💐', '🍀', '🌿', '🍁', '🍂', '🍃', '🌾', '🌱', '🌴', '🌲', '🌳', '🍇', '🍈', '🍉', '🍊', '🍋', '🍌', '🍍', '🥭', '🍎', '🍏', '🍐', '🍑', '🍒', '🍓', '🥝', '🍅', '🥥', '🥑', '🍆', '🥔', '🥕', '🌽', '🌶️', '🥒', '🥬', '🥦', '🧄', '🧅', '🍄', '🥜', '🌰', '🍞', '🥐', '🥖', '🥨', '🥯', '🥞', '🧇', '🧀', '🍗', '🍖', '🌭', '🍔', '🍟', '🍕', '🥪', '🥙', '🌮', '🌯', '🥗', '🥘', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🥟', '🍤', '🍙', '🍚', '🍘', '🍥', '🥠', '🥮', '🍢', '🍡', '🍧', '🍨', '🍦', '🥧', '🧁', '🍰', '🎂', '🍮', '🍭', '🍬', '🍫', '🍿', '🍩', '🍪', '🌰', '🥛', '☕', '🍵', '🍶', '🍾', '🍷', '🍸', '🍹', '🍺', '🍻', '🥂', '🥃', '🥤', '🧃', '🧉', '🧊', '🥢', '🍽️', '🍴', '🥄', '🔪', '🏺', '🌍', '🌎', '🌏', '🗾', '🧭', '🏔️', '⛰️', '🌋', '🗻', '🏕️', '🏖️', '🏜️', '🏝️', '🏞️', '🏟️', '🏛️', '🏗️', '🧱', '🏘️', '🏚️', '🏠', '🏡', '🏢', '🏣', '🏤', '🏥', '🏦', '🏨', '🏩', '🏪', '🏫', '🏬', '🏭', '🏯', '🏰', '💒'];
 
 export default function MemoryGame() {
   const [view, setView] = useState('game');
   const [difficulty, setDifficulty] = useState<DifficultyType>('easy');
-  const [cards, setCards] = useState([]);
-  const [flipped, setFlipped] = useState([]);
-  const [matched, setMatched] = useState([]);
+  const [cards, setCards] = useState<Card[]>([]);
+  const [flipped, setFlipped] = useState<number[]>([]);
+  const [matched, setMatched] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
   const [time, setTime] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -26,8 +47,8 @@ export default function MemoryGame() {
   const [showNameInput, setShowNameInput] = useState(false);
   const [nickname, setNickname] = useState('');
   const [userNickname, setUserNickname] = useState('');
-  const [leaderboard, setLeaderboard] = useState({ easy: [], medium: [], hard: [] });
-  const [personalHistory, setPersonalHistory] = useState({ easy: [], medium: [], hard: [] });
+  const [leaderboard, setLeaderboard] = useState<LeaderboardData>({ easy: [], medium: [], hard: [] });
+  const [personalHistory, setPersonalHistory] = useState<LeaderboardData>({ easy: [], medium: [], hard: [] });
 
   useEffect(() => {
     initApp();
@@ -159,8 +180,8 @@ try {
     if (nickname.trim() === userNickname || !userNickname) {
       const savedHistory = JSON.parse(localStorage.getItem('memoryGameHistory') || '{"easy":[],"medium":[],"hard":[]}');
       savedHistory[difficulty] = [...savedHistory[difficulty], newEntry]
-        .sort((a, b) => new Date(b.date) - new Date(a.date));
-      
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
       localStorage.setItem('memoryGameHistory', JSON.stringify(savedHistory));
       localStorage.setItem('memoryGameNickname', nickname.trim());
       
@@ -223,10 +244,10 @@ try {
 
           <div className="bg-white rounded-xl shadow-md p-4 mb-6">
             <div className="flex gap-2 justify-center">
-              {Object.entries(DIFFICULTIES).map(([key, { name }]) => (
+             {Object.entries(DIFFICULTIES).map(([key, { name }]) => (
                 <button
                   key={key}
-                  onClick={() => setDifficulty(key)}
+                  onClick={() => setDifficulty(key as DifficultyType)}
                   className={`px-6 py-2 rounded-lg font-medium transition-all ${
                     difficulty === key
                       ? 'bg-blue-500 text-white shadow-md'
@@ -398,7 +419,7 @@ try {
             {Object.entries(DIFFICULTIES).map(([key, { name }]) => (
               <button
                 key={key}
-                onClick={() => changeDifficulty(key)}
+                onClick={() => changeDifficulty(key as DifficultyType)}
                 className={`px-6 py-2 rounded-lg font-medium transition-all ${
                   difficulty === key
                     ? 'bg-blue-500 text-white shadow-md'
@@ -514,10 +535,16 @@ try {
                       <span className="font-semibold text-gray-700">개인 향상도</span>
                     </div>
                     <div className="grid grid-cols-2 gap-2 text-xs">
+                     <div>
+                       <span className="text-gray-600">이동 횟수: </span>
+                       <span className={getPersonalImprovement()?.movesImprovement && parseFloat(getPersonalImprovement()!.movesImprovement) > 0 ? 'text-green-600 font-semibold' : 'text-red-600'}>
+                        {getPersonalImprovement()?.movesImprovement && parseFloat(getPersonalImprovement()!.movesImprovement) > 0 ? '▼' : '▲'} {Math.abs(parseFloat(getPersonalImprovement()?.movesImprovement || '0'))}%
+                       </span>
+                      </div>
                       <div>
-                        <span className="text-gray-600">이동 횟수: </span>
-                        <span className={getPersonalImprovement().movesImprovement > 0 ? 'text-green-600 font-semibold' : 'text-red-600'}>
-                          {getPersonalImprovement().movesImprovement > 0 ? '▼' : '▲'} {Math.abs(getPersonalImprovement().movesImprovement)}%
+                        <span className="text-gray-600">시간: </span>
+                        <span className={getPersonalImprovement()?.timeImprovement && parseFloat(getPersonalImprovement()!.timeImprovement) > 0 ? 'text-green-600 font-semibold' : 'text-red-600'}>
+                          {getPersonalImprovement()?.timeImprovement && parseFloat(getPersonalImprovement()!.timeImprovement) > 0 ? '▼' : '▲'} {Math.abs(parseFloat(getPersonalImprovement()?.timeImprovement || '0'))}%
                         </span>
                       </div>
                       <div>
