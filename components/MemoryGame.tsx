@@ -81,14 +81,14 @@ export default function MemoryGame() {
     }
   }, [matched, cards]);
 
-  const calculateScore = (moves, time) => {
+  const calculateScore = (moves: number, time: number) => {
     const movesPenalty = moves * 50;
     const timePenalty = time * 2;
     const baseScore = 10000;
     return Math.max(0, baseScore - movesPenalty - timePenalty);
   };
 
-  const initializeGame = (diff) => {
+  const initializeGame = (diff: string) => {
     const { pairs } = DIFFICULTIES[diff];
     const shuffled = EMOJIS.sort(() => Math.random() - 0.5);
     const selectedEmojis = shuffled.slice(0, pairs);
@@ -107,7 +107,7 @@ export default function MemoryGame() {
     setShowNameInput(false);
   };
 
-  const handleCardClick = (index) => {
+  const handleCardClick = (index: number) => {
     if (!isPlaying) setIsPlaying(true);
     if (flipped.length === 2 || flipped.includes(index) || matched.includes(index)) return;
 
@@ -169,12 +169,12 @@ try {
     setShowNameInput(false);
   };
 
-  const changeDifficulty = (diff) => {
+  const changeDifficulty = (diff: string) => {
     setDifficulty(diff);
     initializeGame(diff);
   };
 
-  const formatTime = (seconds) => {
+  const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}분 ${secs}초`;
