@@ -9,11 +9,13 @@ const DIFFICULTIES = {
   hard: { grid: 8, pairs: 32, name: '어려움 (8×8)' }
 };
 
+type DifficultyType = 'easy' | 'medium' | 'hard';
+
 const EMOJIS = ['🎮', '🎯', '🎨', '🎭', '🎪', '🎬', '🎵', '🎸', '🎹', '🎺', '🎻', '🎲', '🎰', '🎳', '⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏉', '🎱', '🏓', '🏸', '🏒', '🏑', '🥊', '🥋', '⛳', '🏹', '🎣', '🥅', '🎄', '🎃', '🎁', '🎈', '🎀', '🎊', '🎉', '🎇', '🎆', '🌟', '⭐', '✨', '💫', '🌈', '☀️', '🌙', '⚡', '🔥', '💧', '❄️', '☁️', '🌸', '🌺', '🌻', '🌷', '🌹', '🏵️', '🌼', '💐', '🍀', '🌿', '🍁', '🍂', '🍃', '🌾', '🌱', '🌴', '🌲', '🌳', '🍇', '🍈', '🍉', '🍊', '🍋', '🍌', '🍍', '🥭', '🍎', '🍏', '🍐', '🍑', '🍒', '🍓', '🥝', '🍅', '🥥', '🥑', '🍆', '🥔', '🥕', '🌽', '🌶️', '🥒', '🥬', '🥦', '🧄', '🧅', '🍄', '🥜', '🌰', '🍞', '🥐', '🥖', '🥨', '🥯', '🥞', '🧇', '🧀', '🍗', '🍖', '🌭', '🍔', '🍟', '🍕', '🥪', '🥙', '🌮', '🌯', '🥗', '🥘', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🥟', '🍤', '🍙', '🍚', '🍘', '🍥', '🥠', '🥮', '🍢', '🍡', '🍧', '🍨', '🍦', '🥧', '🧁', '🍰', '🎂', '🍮', '🍭', '🍬', '🍫', '🍿', '🍩', '🍪', '🌰', '🥛', '☕', '🍵', '🍶', '🍾', '🍷', '🍸', '🍹', '🍺', '🍻', '🥂', '🥃', '🥤', '🧃', '🧉', '🧊', '🥢', '🍽️', '🍴', '🥄', '🔪', '🏺', '🌍', '🌎', '🌏', '🗾', '🧭', '🏔️', '⛰️', '🌋', '🗻', '🏕️', '🏖️', '🏜️', '🏝️', '🏞️', '🏟️', '🏛️', '🏗️', '🧱', '🏘️', '🏚️', '🏠', '🏡', '🏢', '🏣', '🏤', '🏥', '🏦', '🏨', '🏩', '🏪', '🏫', '🏬', '🏭', '🏯', '🏰', '💒'];
 
 export default function MemoryGame() {
   const [view, setView] = useState('game');
-  const [difficulty, setDifficulty] = useState('easy');
+  const [difficulty, setDifficulty] = useState<DifficultyType>('easy');
   const [cards, setCards] = useState([]);
   const [flipped, setFlipped] = useState([]);
   const [matched, setMatched] = useState([]);
@@ -88,7 +90,7 @@ export default function MemoryGame() {
     return Math.max(0, baseScore - movesPenalty - timePenalty);
   };
 
-  const initializeGame = (diff: string) => {
+  const initializeGame = (diff: DifficultyType) => {
     const { pairs } = DIFFICULTIES[diff];
     const shuffled = EMOJIS.sort(() => Math.random() - 0.5);
     const selectedEmojis = shuffled.slice(0, pairs);
@@ -169,7 +171,7 @@ try {
     setShowNameInput(false);
   };
 
-  const changeDifficulty = (diff: string) => {
+  const changeDifficulty = (diff: DifficultyType) => {
     setDifficulty(diff);
     initializeGame(diff);
   };
