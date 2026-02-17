@@ -42,21 +42,21 @@ export default function MemoryGame() {
   };
 
   const loadSharedData = async () => {
-    try {
-      const easyData = await window.storage.get('leaderboard_easy', true);
-      const mediumData = await window.storage.get('leaderboard_medium', true);
-      const hardData = await window.storage.get('leaderboard_hard', true);
-      
-      setLeaderboard({
-        easy: easyData ? JSON.parse(easyData.value) : [],
-        medium: mediumData ? JSON.parse(mediumData.value) : [],
-        hard: hardData ? JSON.parse(hardData.value) : []
-      });
-    } catch (error) {
-      console.log('Loading leaderboard:', error);
-      setLeaderboard({ easy: [], medium: [], hard: [] });
-    }
-  };
+  try {
+    const easyData = localStorage.getItem('leaderboard_easy');
+    const mediumData = localStorage.getItem('leaderboard_medium');
+    const hardData = localStorage.getItem('leaderboard_hard');
+    
+    setLeaderboard({
+      easy: easyData ? JSON.parse(easyData) : [],
+      medium: mediumData ? JSON.parse(mediumData) : [],
+      hard: hardData ? JSON.parse(hardData) : []
+    });
+  } catch (error) {
+    console.log('Loading leaderboard:', error);
+    setLeaderboard({ easy: [], medium: [], hard: [] });
+  }
+};
 
   const loadPersonalHistory = () => {
     const savedHistory = JSON.parse(localStorage.getItem('memoryGameHistory') || '{"easy":[],"medium":[],"hard":[]}');
@@ -137,20 +137,20 @@ export default function MemoryGame() {
       date: new Date().toISOString()
     };
 
-    try {
-      const currentData = await window.storage.get(`leaderboard_${difficulty}`, true);
-      let currentLeaderboard = currentData ? JSON.parse(currentData.value) : [];
-      
-      currentLeaderboard = [...currentLeaderboard, newEntry]
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 100);
-      
-      await window.storage.set(`leaderboard_${difficulty}`, JSON.stringify(currentLeaderboard), true);
-      
-      await loadSharedData();
-    } catch (error) {
-      console.error('Error saving score:', error);
-    }
+try {
+  const currentData = localStorage.getItem(`leaderboard_${difficulty}`);
+  let currentLeaderboard = currentData ? JSON.parse(currentData) : [];
+  
+  currentLeaderboard = [...currentLeaderboard, newEntry]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 100);
+  
+  localStorage.setItem(`leaderboard_${difficulty}`, JSON.stringify(currentLeaderboard));
+  
+  loadSharedData();
+} catch (error) {
+  console.error('Error saving score:', error);
+}
 
     if (nickname.trim() === userNickname || !userNickname) {
       const savedHistory = JSON.parse(localStorage.getItem('memoryGameHistory') || '{"easy":[],"medium":[],"hard":[]}');
