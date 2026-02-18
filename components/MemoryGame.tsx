@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Sparkles, Trophy, Clock, RotateCcw, TrendingUp, Users, Award, BarChart3 } from 'lucide-react';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, getDocs, query, orderBy, limit } from 'firebase/firestore';
 
 const DIFFICULTIES = {
   easy: { grid: 4, pairs: 8, name: '쉬움 (4×4)' },
@@ -65,14 +67,20 @@ export default function MemoryGame() {
 
   const loadSharedData = async () => {
     try {
-      const easyData = localStorage.getItem('leaderboard_easy');
-      const mediumData = localStorage.getItem('leaderboard_medium');
-      const hardData = localStorage.getItem('leaderboard_hard');
-      
+      const easyQuery = query(collection(db, 'leaderboard_easy'), orderBy('score', 'desc'), limit(100));
+      const mediumQuery = query(collection(db, 'leaderboard_medium'), orderBy('score', 'desc'), limit(100));
+      const hardQuery = query(collection(db, 'leaderboard_hard'), orderBy('score', 'desc'), limit(100));
+
+      const [easySnapshot, mediumSnapshot, hardSnapshot] = await Promise.all([
+        getDocs(easyQuery),
+        getDocs(mediumQuery),
+        getDocs(hardQuery)
+      ]);
+
       setLeaderboard({
-        easy: easyData ? JSON.parse(easyData) : [],
-        medium: mediumData ? JSON.parse(mediumData) : [],
-        hard: hardData ? JSON.parse(hardData) : []
+        easy: easySnapshot.docs.map(doc => doc.data() as GameEntry),
+        medium: mediumSnapshot.docs.map(doc => doc.data() as GameEntry),
+        hard: hardSnapshot.docs.map(doc => doc.data() as GameEntry)
       });
     } catch (error) {
       console.log('Loading leaderboard:', error);
@@ -162,16 +170,8 @@ export default function MemoryGame() {
     };
 
     try {
-      const currentData = localStorage.getItem(`leaderboard_${difficulty}`);
-      let currentLeaderboard = currentData ? JSON.parse(currentData) : [];
-      
-      currentLeaderboard = [...currentLeaderboard, newEntry]
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 100);
-      
-      localStorage.setItem(`leaderboard_${difficulty}`, JSON.stringify(currentLeaderboard));
-      
-      loadSharedData();
+      await addDoc(collection(db, `leaderboard_${difficulty}`), newEntry);
+      await loadSharedData();
     } catch (error) {
       console.error('Error saving score:', error);
     }
